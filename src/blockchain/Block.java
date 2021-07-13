@@ -7,20 +7,20 @@ public class Block {
     private int id;
     private long timeStamp;
     private String hash;
-    private Block previous;
+    private String previousHash;
+    private int magicNumber;
 
-    public Block() {
-        this.id = 1;
+
+    public Block(int id, String previousHash) {
+        this.id = id;
+        this.previousHash = previousHash;
+        this.magicNumber = (int) (Math.random() * 100_000_000);
         this.timeStamp = new Date().getTime();
-        this.hash = StringUtil.applySha256(""+getId()+getTimeStamp());
-        this.previous = null;
+        this.hash = computeHashCode();
     }
 
-    public Block(Block previous) {
-        this.previous = previous;
-        this.timeStamp = new Date().getTime();
-        this.id = previous.getId() + 1;
-        this.hash = computeHashCode();
+    public int getMagicNumber() {
+        return magicNumber;
     }
 
     public int getId() {
@@ -35,8 +35,8 @@ public class Block {
         return hash;
     }
 
-    public Block getPrevious() {
-        return previous;
+    public String getPreviousHash() {
+        return previousHash;
     }
 
     @Override
@@ -44,11 +44,11 @@ public class Block {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Block block = (Block) o;
-        return getId() == block.getId() && getTimeStamp() == block.getTimeStamp() && getHash().equals(block.getHash()) && Objects.equals(getPrevious(), block.getPrevious());
+        return getId() == block.getId() && getTimeStamp() == block.getTimeStamp() && getHash().equals(block.getHash()) && Objects.equals(getPreviousHash(), block.getPreviousHash());
     }
 
     private String computeHashCode() {
-        return StringUtil.applySha256(""+getId()+getTimeStamp()+getPrevious().hashCode());
+        return StringUtil.applySha256(""+getId()+getTimeStamp()+getMagicNumber()+getPreviousHash());
     }
 
     @Override
@@ -56,7 +56,8 @@ public class Block {
         return "Block:\n" +
                 "Id: " + getId() + "\n" +
                 "Timestamp: " + getTimeStamp() + "\n" +
-                "Hash of the previous block:\n" + (getPrevious() == null ? "0" : getPrevious().getHash()) + "\n" +
-                "Hash of the block:\n" + getHash() + "\n";
+                "Magic number: " + getMagicNumber() + "\n" +
+                "Hash of the previous block:\n" + (getPreviousHash() == null ? "0" : getPreviousHash()) + "\n" +
+                "Hash of the block:\n" + getHash() + "";
     }
 }
