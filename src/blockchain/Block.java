@@ -1,9 +1,12 @@
 package blockchain;
 
+import blockchain.util.StringUtil;
+
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
-public class Block {
+public class Block implements Serializable {
     private int id;
     private long timeStamp;
     private String hash;

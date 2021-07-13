@@ -1,4 +1,4 @@
-package blockchain;
+package blockchain.util;
 
 import java.security.MessageDigest;
 
