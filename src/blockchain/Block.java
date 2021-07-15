@@ -7,16 +7,18 @@ import java.util.Date;
 import java.util.Objects;
 
 public class Block implements Serializable {
-    private int id;
-    private long timeStamp;
-    private String hash;
-    private String previousHash;
-    private int magicNumber;
+    private final int id;
+    private final long timeStamp;
+    private final String hash;
+    private final String previousHash;
+    private final int magicNumber;
+    private final String creator;
 
 
-    public Block(int id, String previousHash) {
+    public Block(int id, String previousHash, String creator) {
         this.id = id;
         this.previousHash = previousHash;
+        this.creator = creator;
         this.magicNumber = (int) (Math.random() * 100_000_000);
         this.timeStamp = new Date().getTime();
         this.hash = computeHashCode();
@@ -28,6 +30,10 @@ public class Block implements Serializable {
 
     public int getId() {
         return id;
+    }
+
+    public String getCreator() {
+        return creator;
     }
 
     public long getTimeStamp() {
@@ -51,12 +57,13 @@ public class Block implements Serializable {
     }
 
     private String computeHashCode() {
-        return StringUtil.applySha256(""+getId()+getTimeStamp()+getMagicNumber()+getPreviousHash());
+        return StringUtil.applySha256(""+getId()+getTimeStamp()+getMagicNumber()+getPreviousHash()+getCreator());
     }
 
     @Override
     public String toString() {
-        return "Block:\n" +
+        return "Block: \n" +
+                "Created by " + getCreator() + "\n" +
                 "Id: " + getId() + "\n" +
                 "Timestamp: " + getTimeStamp() + "\n" +
                 "Magic number: " + getMagicNumber() + "\n" +
