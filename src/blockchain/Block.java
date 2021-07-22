@@ -3,7 +3,9 @@ package blockchain;
 import blockchain.util.StringUtil;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class Block implements Serializable {
@@ -13,6 +15,7 @@ public class Block implements Serializable {
     private final String previousHash;
     private final int magicNumber;
     private final String creator;
+    private ArrayList<String> data;
 
 
     public Block(int id, String previousHash, String creator) {
@@ -22,6 +25,7 @@ public class Block implements Serializable {
         this.magicNumber = (int) (Math.random() * 100_000_000);
         this.timeStamp = new Date().getTime();
         this.hash = computeHashCode();
+        this.data = new ArrayList<>();
     }
 
     public int getMagicNumber() {
@@ -48,12 +52,26 @@ public class Block implements Serializable {
         return previousHash;
     }
 
+    public void setData(ArrayList<String> data) {
+        this.data = data;
+    }
+
+    public void addMessage(String message) {
+        data.add(message);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Block block = (Block) o;
         return getId() == block.getId() && getTimeStamp() == block.getTimeStamp() && getHash().equals(block.getHash()) && Objects.equals(getPreviousHash(), block.getPreviousHash());
+    }
+
+    private String printData() {
+        StringBuilder builder = new StringBuilder();
+        data.forEach(m -> builder.append("\n" + m));
+        return builder.toString();
     }
 
     private String computeHashCode() {
@@ -68,6 +86,7 @@ public class Block implements Serializable {
                 "Timestamp: " + getTimeStamp() + "\n" +
                 "Magic number: " + getMagicNumber() + "\n" +
                 "Hash of the previous block:\n" + (getPreviousHash() == null ? "0" : getPreviousHash()) + "\n" +
-                "Hash of the block:\n" + getHash() + "";
+                "Hash of the block:\n" + getHash() + "\n" +
+                "Block data: " + (data.size() == 0 ? "no messages" : printData());
     }
 }

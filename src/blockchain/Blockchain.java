@@ -11,35 +11,22 @@ public class Blockchain implements Serializable {
     private static final long serialVersionUID = 1L;
     private int noOfZeros;
     private List<Block> blocks;
+    private volatile ArrayList<String> messages;
 
     public Blockchain() {
         noOfZeros = 0;
         blocks = new ArrayList<>();
+        messages = new ArrayList<>();
     }
-
-    /*public Block newBlock() {
-        int id = blocks.size() + 1;
-        String previousHash = id == 1 ? null : blocks.get(blocks.size()-1).getHash();
-        Block block = null;
-
-        boolean correct = false;
-
-        while (!correct) {
-            block = new Block(id, previousHash);
-            correct = true;
-            for (int i = 0; correct && i < noOfZeros; i++) {
-                if (block.getHash().charAt(i) != '0') {
-                    correct = false;
-                }
-            }
-        }
-        blocks.add(block);
-        return block;
-    }*/
 
     public synchronized boolean addBlock(Block block) {
         if (!validate(block)) return false;
         long generationTime = getLast() == null ? 0 : (block.getTimeStamp() - getLast().getTimeStamp()) / 1000;
+
+        if (!messages.isEmpty()) {
+            messages.forEach(block::addMessage);
+            messages.clear();
+        }
         System.out.println(block);
         System.out.println("Block was generating for " + generationTime + " seconds");
 
@@ -53,12 +40,13 @@ public class Blockchain implements Serializable {
             System.out.println("N stays the same");
         }
         System.out.println();
+
         blocks.add(block);
         return true;
     }
 
     public boolean validate(Block block) {
-        if (blocks.size() == 0) return true;
+        if (blocks.isEmpty()) return true;
         for (int i = 0; i < blocks.size(); i++){
             if (block.getHash().equals(blocks.get(i).getHash())) {
                 if (i == 0) return true;
@@ -72,7 +60,7 @@ public class Blockchain implements Serializable {
     }
 
     public Block getLast() {
-        return blocks.size() == 0 ? null : blocks.get(blocks.size()-1);
+        return blocks.isEmpty() ? null : blocks.get(blocks.size()-1);
     }
 
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException, InvalidBlockException {
@@ -82,5 +70,9 @@ public class Blockchain implements Serializable {
                 throw new InvalidBlockException();
             }
         }
+    }
+
+    public void addMessage(String message) {
+        messages.add(message);
     }
 }
